@@ -2,6 +2,10 @@ import java.io.File;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+
 
 public class main {
     static String getFileExtension(String filename) {
@@ -14,6 +18,24 @@ public class main {
         }
         return "";
     }
+
+    public static int getTerminalWidth() {
+        try {
+            // "stty size" prints "rows cols"; reading from /dev/tty targets the real terminal
+            Process p = new ProcessBuilder("sh", "-c", "stty size < /dev/tty").start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                String line = r.readLine();
+                if (line != null) {
+                    return Integer.parseInt(line.trim().split("\\s+")[1]);
+                }
+            }
+        } catch (Exception e) {
+        }
+        return 120;
+    }
+
+
+
     public static void main (String[] args) throws IOException{
         String path = args[0];
 
@@ -44,10 +66,22 @@ public class main {
                 int[][] matr = new int[height][width];
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
-                        matr[y][x]= (pixels[y][x][0]+pixels[y][x][0]+pixels[y][x][0])/ 3;
+                        matr[y][x]= (((pixels[y][x][0]+pixels[y][x][0]+pixels[y][x][0])/ 3)*8)/255;
                     }
                 }
+                String opacity = "#@%*+=-:.";
+                char[][] matrchr = new char[height][width];
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        matrchr[y][x]= opacity.charAt(matr[y][x]);
+                        System.out.print(matrchr[y][x]);
+                    }
+                    System.out.print("\n");
+                }
 
+
+
+                /* .:-=+*%@#   */
 
 
                 
